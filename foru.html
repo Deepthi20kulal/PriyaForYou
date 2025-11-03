@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Will You Marry Me?</title>
+  <style>
+    :root{--bg:#0b1020;--accent:#ff4d85;--soft:#ffd6e8}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,#0b1020 0%, #1b1530 60%);color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center}
+
+    .stage{z-index:2;display:flex;flex-direction:column;align-items:center;gap:22px;padding:30px;text-align:center}
+    .heart{width:320px;height:320px;position:relative;transform:scale(1);transition:transform .35s ease;}
+    .heart:before,.heart:after{content:'';position:absolute;left:50%;top:0;width:160px;height:250px;background:linear-gradient(180deg,var(--accent),#ff7fb3);border-radius:80px 80px 0 0;transform-origin:bottom center}
+    .heart:before{transform:translateX(-50%) rotate(-45deg);}
+    .heart:after{transform:translateX(-50%) rotate(45deg);}
+    .heart .core{position:absolute;left:50%;top:40px;transform:translateX(-50%);width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb6d1,#ff7fb3);filter:drop-shadow(0 10px 25px rgba(255,77,133,.18));}
+    .heart:hover{transform:scale(1.03)}
+
+    h1{font-size:28px;margin:0;letter-spacing:1px}
+    p.lead{max-width:720px;color:#ffe6f0;margin:0}
+    .cta{margin-top:6px}
+
+    button.primary{background:linear-gradient(90deg,var(--accent),#ff83a9);border:0;padding:14px 28px;border-radius:999px;font-weight:700;cursor:pointer;font-size:16px;box-shadow:0 10px 30px rgba(255,77,133,.16)}
+
+    .overlay{position:fixed;inset:0;background:rgba(3,3,8,0.7);display:flex;align-items:center;justify-content:center;z-index:40;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.25s ease}
+    .overlay.show{opacity:1;pointer-events:auto}
+    .modal{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:16px;padding:28px;max-width:720px;color:#111;box-shadow:0 20px 60px rgba(7,6,20,.6);transform:translateY(20px);transition:transform .28s ease}
+    .overlay.show .modal{transform:translateY(0)}
+
+    .letter{background:linear-gradient(180deg,#fff,#fff8fb);padding:22px;border-radius:12px;color:#2b1322;line-height:1.45;font-size:16px}
+    .letter h2{margin-top:0;color:var(--accent)}
+
+    .proposal{display:none;flex-direction:column;align-items:center;gap:14px}
+    .proposal.show{display:flex}
+    .answer-row{display:flex;gap:12px}
+
+    .falling-img{position:fixed;top:-10vh;pointer-events:none;z-index:10;opacity:.9;width:40px;height:40px;animation:fall 6s linear forwards;}
+    @keyframes fall{0%{transform:translateY(-10vh) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(120vh) rotate(720deg);opacity:0.95}}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="heart" id="heart" aria-hidden="true"><div class="core"></div></div>
+    <h1>For my favourite person</h1>
+    <p class="lead">A small heart, a big question. When you're ready, tap the button below.</p>
+    <div class="cta"><button class="primary" id="openLetter">Click me ❤️</button></div>
+  </div>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="letter" id="letterContent">
+        <h2>My love,</h2>
+        <p>Every morning I wake up and think of you — your laugh, your warmth, your presence, your broken arm, broken leg, your kappu charma and the marks i left on you . You make ordinary moments extraordinary. I love you endlessly.</p>
+        <p>There’s one small question left for the biggest moment of our lives.</p>
+        <div style="text-align:center;margin-top:16px"><button class="primary" id="nextToQuestion">Click me again 💌</button></div>
+      </div>
+
+      <div class="proposal" id="proposalBox" style="margin-top:16px">
+        <h2 style="color:var(--accent);margin:0">Will you marry me?</h2>
+        <p style="margin:0 0 10px 0;color:#4a1f2b">(Choose any yes you like)</p>
+        <div class="answer-row">
+          <button class="primary" id="yes1">Yes</button>
+          <button class="primary" id="yes2">Yes, yes!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay=document.getElementById('overlay');
+    const openLetter=document.getElementById('openLetter');
+    const nextToQuestion=document.getElementById('nextToQuestion');
+    const proposalBox=document.getElementById('proposalBox');
+    const heart=document.getElementById('heart');
+    const yes1=document.getElementById('yes1');
+    const yes2=document.getElementById('yes2');
+
+    openLetter.addEventListener('click',()=>{overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');createImageRain(20);});
+    nextToQuestion.addEventListener('click',()=>{document.getElementById('letterContent').style.display='none';proposalBox.classList.add('show');createImageRain(30);});
+
+    function celebrate(){proposalBox.innerHTML='<h2 style="color:var(--accent);margin:0">You said YES! 💍</h2><p style="margin:8px 0 0 0;color:#4a1f2b">I promise to love you forever.</p>';createImageRain(40);}
+    yes1.addEventListener('click',celebrate);yes2.addEventListener('click',celebrate);
+
+    overlay.addEventListener('click',e=>{if(e.target===overlay){overlay.classList.remove('show');overlay.setAttribute('aria-hidden','true');}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){overlay.classList.remove('show');overlay.setAttribute('aria-hidden','true');}});
+
+    function createImageRain(count){
+      const container=document.body;
+      for(let i=0;i<count;i++){
+        const img=document.createElement('img');
+        img.className='falling-img';
+        img.src='baby.png'; // example heart image
+        img.style.left=Math.random()*100+'vw';
+        const delay=Math.random()*2;
+        const dur=4+Math.random()*4;
+        img.style.animationDuration=dur+'s';
+        img.style.animationDelay=delay+'s';
+        img.style.width=(30+Math.random()*30)+'px';
+        img.style.height='auto';
+        container.appendChild(img);
+        setTimeout(()=>img.remove(),(delay+dur)*1000);
+      }
+    }
+  </script>
+</body>
+</html>
